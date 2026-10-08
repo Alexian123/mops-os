@@ -18,7 +18,9 @@ debug: raw
 	gdb -x $(SCRIPTS_DIR)/debug.gdb
 
 raw: kernel bootloader
-	cp $(BUILD_DIR)/bootloader/boot.bin $(RAW_IMAGE)
+	dd if=$(BUILD_DIR)/bootloader/boot.bin >> $(RAW_IMAGE)
+	dd if=$(BUILD_DIR)/kernel/kernel.bin >> $(RAW_IMAGE)
+	dd if=/dev/zero bs=512 count=100 >> $(RAW_IMAGE)
 
 kernel: always
 	$(MAKE) -C $(KERNEL_SRC_DIR)

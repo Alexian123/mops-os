@@ -1,5 +1,5 @@
 ORG 0x7C00
-BITS 16
+[BITS 16]
 
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
@@ -82,26 +82,73 @@ gdt_descriptor:
     dw gdt_end - gdt_start - 1
     dd gdt_start
 
-message:    db 'Hello World!', 0Dh, 0Ah, 0
-msg_error:  db 'ERROR: Failed to read disk', 0Dh, 0Ah, 0
+message:    db 'Loading kernel...', 0Dh, 0Ah, 0
 
 [BITS 32]
 pmode_start:
-    mov ax, DATA_SEG
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
-    mov ebp, 0x00200000
-    mov esp, ebp
+    mov eax, 1          ; starting sector LBA (bootloader=0)
+    mov ecx, 100        ; total sectors to read
+    mov edi, 0x0100000  ; target buffer (1MB)
+    call ata_lba_read
+    jmp CODE_SEG:0x0100000
 
-    ; fast enable A20 gate
-    in al, 0x92
-    or al, 2
-    out 0x92, al
+ata_lba_read:
+    mov ebx, eax        ; save LBA
 
-    jmp $
+    ; send byte 3 of LBA to HW controller
+    shr eax, 24
+    or eax, 0E0h        ; select master drive
+    mov dx, 0x1F6       ; port address
+    out dx, al
+
+    ; send total sectors to HW controller
+    mov eax, ecx
+    mov dx, 0x1F2       ; port address
+    out dx, al
+
+    ; send byte 0 of LBA to HW controller
+    mov eax, ebx
+    mov dx, 0x1F3       ; port address
+    out dx, al
+
+    ; send byte 1 of LBA to HW controller
+    mov eax, ebx
+    shr eax, 8
+    mov dx, 0x1F4       ; port address
+    out dx, al
+
+    ; send byte 2 of LBA to HW controller
+    mov eax, ebx
+    shr eax, 16
+    mov dx, 0x1F5       ; port address
+    out dx, al
+
+    ; ???
+    mov al, 20h
+    mov dx, 0x1F7       ; port address
+    out dx, al
+
+    ; read sectors into memory
+.next_sector:
+    push ecx
+
+.retry:
+    ; check reading is needed
+    mov dx, 0x1F7       ; port address
+    in al, dx
+    test al, 8
+    jz .retry
+
+    ; must read 256 words at a time
+    mov ecx, 256
+    mov dx, 0x1F0       ; port address
+    rep insw
+
+    ; read next sector
+    pop ecx
+    loop .next_sector
+
+    ret
 
 times 510-($-$$) db 0
 dw 0AA55h

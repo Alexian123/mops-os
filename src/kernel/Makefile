@@ -14,11 +14,11 @@ OBJECTS_ASM=$(patsubst %.asm, $(BUILD_DIR)/kernel/asm/%.elf, $(SOURCES_ASM))
 
 all: kernel
 
-kernel: $(BUILD_DIR)/kernel.bin
+kernel: $(BUILD_DIR)/kernel/kernel.bin
 
-$(BUILD_DIR)/kernel.bin: $(OBJECTS_ASM) $(OBJECTS_C)
-#	@$(TARGET_LD) $(TARGET_LINKFLAGS) -Wl,-Map=$(BUILD_DIR)/kernel.map -o $@ $^ $(TARGET_LIBS)
-#	@echo "--> Linked  kernel.bin"
+$(BUILD_DIR)/kernel/kernel.bin: $(OBJECTS_ASM) $(OBJECTS_C)
+	@$(TARGET_LD) $(TARGET_LINKFLAGS) -Wl,-Map=$(BUILD_DIR)/kernel/kernel.map -o $@ $^ $(TARGET_LIBS)
+	@echo "--> Linked  kernel.bin"
 
 $(BUILD_DIR)/kernel/c/%.o: %.c $(HEADERS_C)
 	@mkdir -p $(@D)
