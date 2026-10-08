@@ -1,6 +1,6 @@
 include config/global.mk
 
-.PHONY: all raw run debug always clean kernel bootloader
+.PHONY: all raw run run_debug debug always clean kernel bootloader
 
 all: raw
 
@@ -11,12 +11,14 @@ RAW_IMAGE=$(BUILD_DIR)/mops-os.bin
 run: raw
 	qemu-system-x86_64 -hda $(RAW_IMAGE)
 
+run_debug: raw
+	qemu-system-x86_64 -hda $(RAW_IMAGE) -S -gdb tcp::1234
+
 debug: raw
-	$(SCRIPTS_DIR)/debug.sh $(SCRIPTS_DIR)/debug.gdb $(RAW_IMAGE)
+	gdb -x $(SCRIPTS_DIR)/debug.gdb
 
 raw: kernel bootloader
 	cp $(BUILD_DIR)/bootloader/boot.bin $(RAW_IMAGE)
-	dd if=/dev/zero bs=512 count=1 >> $(RAW_IMAGE)
 
 kernel: always
 	$(MAKE) -C $(KERNEL_SRC_DIR)
