@@ -17,7 +17,8 @@ all: kernel
 kernel: $(BUILD_DIR)/kernel.bin
 
 $(BUILD_DIR)/kernel.bin: $(OBJECTS_ASM) $(OBJECTS_C)
-	@echo "--> Linked  kernel.bin"
+#	@$(TARGET_LD) $(TARGET_LINKFLAGS) -Wl,-Map=$(BUILD_DIR)/kernel.map -o $@ $^ $(TARGET_LIBS)
+#	@echo "--> Linked  kernel.bin"
 
 $(BUILD_DIR)/kernel/c/%.o: %.c $(HEADERS_C)
 	@mkdir -p $(@D)
