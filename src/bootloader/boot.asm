@@ -39,10 +39,11 @@ start:
     mov cr0, eax
     jmp CODE_SEG:pmode_start
 
-hang:
+    ; if this is reached we're doomed
     cli
+hang:
     hlt
-    jmp $
+    jmp hang
 
 ; DS:SI = null terminated char*
 print:

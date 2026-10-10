@@ -28,7 +28,7 @@ kernel: always
 bootloader: always
 	$(MAKE) -C $(BOOTLOADER_SRC_DIR)
 
-always: clean
+always:
 
 clean:
 	$(MAKE) -C $(KERNEL_SRC_DIR) clean

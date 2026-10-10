@@ -14,10 +14,11 @@ export LIBS=
 export TARGET=i686-elf
 export TARGET_ASM=nasm
 export TARGET_ASMFLAGS=-f elf -g
-export TARGET_CFLAGS=-std=c99 -g -O2
+export TARGET_CFLAGS=-std=gnu99 -g
 export TARGET_CC=$(TARGET)-gcc
 export TARGET_CXX=$(TARGET)-g++
 export TARGET_LD=$(TARGET)-gcc
+export TARGET_OBJCOPY=$(TARGET)-objcopy
 export TARGET_LINKFLAGS=-g
 export TARGET_LIBS=
 

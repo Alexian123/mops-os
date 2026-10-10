@@ -1,6 +1,7 @@
-TARGET_CFLAGS += -Wall -ffreestanding -nostdlib -I$(KERNEL_INCLUDE_DIR) -I$(LIBK_INCLUDE_DIR)
+TARGET_CFLAGS += -ffreestanding -nostdlib -I$(KERNEL_INCLUDE_DIR) -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-functions -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostartfiles -nodefaultlibs -Wall -O0
 TARGET_LIBS += -lgcc
-TARGET_LINKFLAGS += -T $(KERNEL_SRC_DIR)/arch/i686/linker.ld -nostdlib -ffreestanding -O2
+TARGET_LINKFLAGS += -T $(KERNEL_SRC_DIR)/arch/i686/linker.ld -nostdlib -ffreestanding
+TARGET_ASMFLAGS += -F dwarf
 
 HEADERS_C=$(shell find . -type f -name "*.h")
 SOURCES_C=$(shell find . -type f -name "*.c")
@@ -16,9 +17,14 @@ all: kernel
 
 kernel: $(BUILD_DIR)/kernel/kernel.bin
 
-$(BUILD_DIR)/kernel/kernel.bin: $(OBJECTS_ASM) $(OBJECTS_C)
+$(BUILD_DIR)/kernel/kernel.elf: $(OBJECTS_ASM) $(OBJECTS_C)
+	@mkdir -p $(@D)
 	@$(TARGET_LD) $(TARGET_LINKFLAGS) -Wl,-Map=$(BUILD_DIR)/kernel/kernel.map -o $@ $^ $(TARGET_LIBS)
-	@echo "--> Linked  kernel.bin"
+	@echo "--> Linked  kernel.elf"
+
+$(BUILD_DIR)/kernel/kernel.bin: $(BUILD_DIR)/kernel/kernel.elf
+	$(TARGET)-objcopy -O binary $< $@
+	@echo "--> Generated kernel.bin"
 
 $(BUILD_DIR)/kernel/c/%.o: %.c $(HEADERS_C)
 	@mkdir -p $(@D)
