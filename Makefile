@@ -9,10 +9,10 @@ include config/toolchain.mk
 RAW_IMAGE=$(BUILD_DIR)/mops-os.bin
 
 run: raw
-	qemu-system-x86_64 -hda $(RAW_IMAGE)
+	qemu-system-i386 -hda $(RAW_IMAGE)
 
 run_debug: raw
-	qemu-system-x86_64 -hda $(RAW_IMAGE) -S -gdb tcp::1234
+	qemu-system-i386 -hda $(RAW_IMAGE) -S -gdb tcp::1234
 
 debug: raw
 	gdb -x $(SCRIPTS_DIR)/debug.gdb

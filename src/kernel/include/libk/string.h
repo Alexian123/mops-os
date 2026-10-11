@@ -1,34 +1,36 @@
 #ifndef __LIBK_STRING_H__
 #define __LIBK_STRING_H__
 
-#include <stddef.h>
-#include <stdbool.h>
+#include <common.h>
 
-extern size_t strlen(const char *s);
-extern size_t strnlen(const char *s, size_t n);
+void* memcpy(void *dst, const void *src, szt n);
+void* memset(void *s, int c, szt n);
 
-extern char* strcat(char *dst, const char *src);
-extern char* strncat(char *dst, const char *src, size_t n);
+szt strlen(const char *s);
+szt strnlen(const char *s, szt n);
 
-extern char* strcpy(char *dst, const char *src);
-extern char* strncpy(char *dst, const char *src, size_t n);
+char* strcat(char *dst, const char *src);
+char* strncat(char *dst, const char *src, szt n);
 
-extern int strcmp(const char *dst, const char *src);
-extern int strncmp(const char *dst, const char *src, size_t n);
+char* strcpy(char *dst, const char *src);
+char* strncpy(char *dst, const char *src, szt n);
 
-extern bool streq(const char *dst, const char *src);
-extern bool strneq(const char *dst, const char *src, size_t n);
+int strcmp(const char *dst, const char *src);
+int strncmp(const char *dst, const char *src, szt n);
 
-extern char* strchr(const char *s, char c);
-extern char* strnchr(const char *s, char c, size_t n);
+int streq(const char *dst, const char *src);
+int strneq(const char *dst, const char *src, szt n);
 
-extern char* strrchr(const char *s, char c);
-extern char* strnrchr(const char *s, char c, size_t n);
+char* strchr(const char *s, char c);
+char* strnchr(const char *s, char c, szt n);
 
-extern char* strstr(const char *s1, const char *s2);
-extern char* strnstr(const char *s1, const char *s2, size_t n);
+char* strrchr(const char *s, char c);
+char* strnrchr(const char *s, char c, szt n);
 
-extern char* strrstr(const char *s1, const char *s2);
-extern char* strnrstr(const char *s1, const char *s2, size_t n);
+char* strstr(const char *s1, const char *s2);
+char* strnstr(const char *s1, const char *s2, szt n);
+
+char* strrstr(const char *s1, const char *s2);
+char* strnrstr(const char *s1, const char *s2, szt n);
 
 #endif

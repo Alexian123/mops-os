@@ -1,21 +1,20 @@
 #include <drivers/vga_text.h>
-#include <stdint.h>
-#include <stddef.h>
+#include <common.h>
 
 #define VGA_ADDRESS 0xB8000
 
-static volatile uint8_t* const vga = (volatile uint8_t*)VGA_ADDRESS;
+static volatile u8* const vga = (volatile u8*)VGA_ADDRESS;
 
-static uint8_t color = 0x0F;
-static uint8_t tab_size = 4;
-static uint8_t col = 0;
-static uint8_t row = 0;
+static u8 color = 0x0F;
+static u8 tab_size = 4;
+static u8 col = 0;
+static u8 row = 0;
 
-static void _vga_putc_at(char c, uint8_t row, uint8_t col);
+static void _vga_putc_at(char c, u8 row, u8 col);
 static void _vga_scroll(void);
 
 void vga_clearscr(void) {
-    for (size_t i = 0; i < VGA_COLUMNS * VGA_ROWS; ++i) {
+    for (szt i = 0; i < VGA_COLUMNS * VGA_ROWS; ++i) {
         vga[i*2] = ' ';
         vga[i*2 + 1] = color;
     }
@@ -57,25 +56,25 @@ void vga_puts(const char *str) {
     }
 }
 
-void _vga_putc_at(char c, uint8_t row, uint8_t col)
+void _vga_putc_at(char c, u8 row, u8 col)
 {
-    size_t index = (row * VGA_COLUMNS + col) * 2;
+    szt index = (row * VGA_COLUMNS + col) * 2;
     vga[index] = (unsigned char)c;
     vga[index + 1] = color;
 }
 
 void _vga_scroll(void){
-    for (size_t i = 1; i< VGA_ROWS; ++i) {
-        for (size_t j = 0; j < VGA_COLUMNS; ++j) {
-            size_t src = (i * VGA_COLUMNS + j) * 2;
-            size_t dst = ((i - 1) * VGA_COLUMNS + j) * 2;
+    for (szt i = 1; i< VGA_ROWS; ++i) {
+        for (szt j = 0; j < VGA_COLUMNS; ++j) {
+            szt src = (i * VGA_COLUMNS + j) * 2;
+            szt dst = ((i - 1) * VGA_COLUMNS + j) * 2;
             vga[dst] = vga[src];
             vga[dst + 1] = vga[src + 1];
         }
     }
 
-    for (size_t i = 0; i < VGA_COLUMNS; ++i) {
-        size_t index = ((VGA_ROWS - 1) * VGA_COLUMNS + i) * 2;
+    for (szt i = 0; i < VGA_COLUMNS; ++i) {
+        szt index = ((VGA_ROWS - 1) * VGA_COLUMNS + i) * 2;
         vga[index] = ' ';
         vga[index + 1] = color;
     }
