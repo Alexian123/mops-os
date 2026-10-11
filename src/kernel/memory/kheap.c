@@ -1,0 +1,27 @@
+#include <memory/kheap.h>
+#include <memory/heap.h>
+#include <drivers/vga_text.h>
+
+static struct heap kernel_heap;
+static struct heap_table kernel_heap_table;
+
+void kheap_init(void) {
+    kernel_heap_table.entries = (hb_table_entry*)KERNEL_HEAP_TABLE_ADDRESS;
+    kernel_heap_table.total = KERNEL_HEAP_SIZE_BYTES / HEAP_BLOCK_SIZE;
+
+    void *end = (void*)(KERNEL_HEAP_ADDRESS + KERNEL_HEAP_SIZE_BYTES);
+    int res = heap_create(&kernel_heap, (void*)KERNEL_HEAP_ADDRESS, end, &kernel_heap_table);
+
+    if (res < 0) {  // error
+        vga_puts("ERROR: Failed to create kernel heap.\n");
+        for (;;);
+    }
+}
+
+void* kmalloc(szt size) {
+    return heap_malloc(&kernel_heap, size);
+}
+
+void kfree(void *ptr) {
+    heap_free(&kernel_heap, ptr);
+}

@@ -15,9 +15,21 @@
 
 
 /* ---------------------------- Constants ---------------------------- */
-#define MAX_INTERRUPTS          512
-#define KERNEL_CODE_SELECTOR    0x08
-#define KERNEL_DATA_SELECTOR    0x10
+#define KERNEL_CODE_SELECTOR        0x08
+#define KERNEL_DATA_SELECTOR        0x10
+
+#define MAX_INTERRUPTS              512
+
+#define HEAP_BLOCK_SIZE             4096
+
+#define KERNEL_HEAP_SIZE_BYTES      104857600   // 100 MB
+#define KERNEL_HEAP_ADDRESS         0x01000000
+#define KERNEL_HEAP_TABLE_ADDRESS   0x00007E00
+
+#define STATUS_OK                   0
+#define STATUS_IO_ERROR             1
+#define STATUS_INVALID_ARG_ERROR    2
+#define STATUS_NO_MEMORY_ERROR      3
 /* ------------------------------------------------------------------- */
 
 

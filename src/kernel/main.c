@@ -1,6 +1,7 @@
 #include <common.h>
 #include <idt.h>
 #include <port_io.h>
+#include <memory/kheap.h>
 
 // drivers
 #include <drivers/vga_text.h>
@@ -11,8 +12,10 @@ void kmain(void) {
     vga_clearscr();
     vga_puts("Welcome!\n");
 
-    idt_init();
+    kheap_init();
 
+    idt_init();
+    
     // hang
     for (;;);
 }
