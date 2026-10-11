@@ -25,7 +25,18 @@ _start:
     or al, 2
     out 0x92, al
 
+    ; remap master PIC
+    mov al, 00010001b
+    out 0x20, al
+
+    mov al, 20h ; master ISR should start here
+    out 0x21, al
+
+    mov al, 00000001b
+    out 0x21, al
+
     ; enter kernel
+    sti
     call kmain
 
     ; should never reach this point, but who knows?
