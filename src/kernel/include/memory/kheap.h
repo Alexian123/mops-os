@@ -5,6 +5,7 @@
 
 void kheap_init(void);
 void* kmalloc(szt size);
+void* kzalloc(szt size);
 void kfree(void *ptr);
 
 #endif

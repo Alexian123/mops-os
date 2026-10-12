@@ -2,6 +2,7 @@
 #include <memory/heap.h>
 #include <drivers/vga_text.h>
 #include <utils.h>
+#include <libk/string.h>
 
 static struct heap kernel_heap;
 static struct heap_table kernel_heap_table;
@@ -14,12 +15,18 @@ void kheap_init(void) {
     int res = heap_create(&kernel_heap, (void*)KERNEL_HEAP_ADDRESS, end, &kernel_heap_table);
     
     if (res < 0) {  // error
-        panic("Failed to create kernel heap.\n");
+        panic("Failed to create kernel heap");
     }
 }
 
 void* kmalloc(szt size) {
     return heap_malloc(&kernel_heap, size);
+}
+
+void* kzalloc(szt size) {
+    void *ptr = kmalloc(size);
+    if (ptr) memset(ptr, 0, size);
+    return ptr;
 }
 
 void kfree(void *ptr) {
