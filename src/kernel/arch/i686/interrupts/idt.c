@@ -1,8 +1,8 @@
-#include <idt.h>
+#include <interrupts/idt.h>
 #include <common.h>
 #include <libk/string.h>
 #include <drivers/vga_text.h>
-#include <port_io.h>
+#include <io/port_io.h>
 
 struct idt_entry
 {

@@ -10,6 +10,9 @@ extern kmain
 
 global _start
 _start:
+    ; ensure interrupts are off
+    cli
+
     ; setup segments and stack
     mov ax, DATA_SEG
     mov ds, ax
@@ -36,7 +39,6 @@ _start:
     out 0x21, al
 
     ; enter kernel
-    sti
     call kmain
 
     ; should never reach this point, but who knows?
