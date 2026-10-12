@@ -104,7 +104,8 @@ int heap_get_start_block(struct heap *heap, u32 blocks) {
             bs = i;
         }
         
-        if (++bc == blocks) {
+        ++bc;
+        if (bc == blocks) {
             break;
         }
     }
