@@ -2,7 +2,7 @@
 #include <common.h>
 #include <libk/string.h>
 #include <drivers/vga_text.h>
-#include <io/port_io.h>
+#include <port_io.h>
 
 struct idt_entry
 {
