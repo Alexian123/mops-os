@@ -22,6 +22,10 @@ void kmain(void) {
     kheap_init();
     vga_puts("Initialized kernel heap.\n");
 
+    // init disks
+    disk_locate_and_init();
+    vga_puts("Located and initialized all disks (lie).\n");
+
     idt_init();
     vga_puts("Loaded IDT.\n");
 
@@ -32,9 +36,11 @@ void kmain(void) {
     paging_enable();
     vga_puts("Loaded kernel page directory. Paging is now active.\n");
 
+    // test reading from disk 0
     char buf[512];
     memset(buf, 0, 512);
-    disk_read_sectors(0, 1, buf);   // read boot sector
+    DISK *primary = disk_get(0);
+    disk_read_blocks(primary, 0, 1, buf);   // read boot sector
 
     enable_interrupts();
     vga_puts("Interrupts are now active. Beware!\n");

@@ -26,6 +26,8 @@
 #define KERNEL_HEAP_ADDRESS         0x01000000
 #define KERNEL_HEAP_TABLE_ADDRESS   0x00007E00
 
+#define DISK_SECTOR_SIZE            512 // bytes
+
 #define STATUS_OK                   0
 #define STATUS_IO_ERROR             1
 #define STATUS_INVALID_ARG_ERROR    2

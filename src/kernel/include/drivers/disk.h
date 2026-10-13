@@ -3,7 +3,14 @@
 
 #include <common.h>
 
-// read from Primary Disk
-int disk_read_sectors(int lba, int total, void *dst);
+#define DISK_TYPE_PHYS  0
+
+typedef u32 disk_type;
+
+typedef struct disk DISK;
+
+void disk_locate_and_init(void);
+DISK* disk_get(int index);
+int disk_read_blocks(DISK* disk, u32 lba, int total, void *dst);
 
 #endif

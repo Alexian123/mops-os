@@ -1,9 +1,18 @@
 #include <drivers/disk.h>
 #include <port_io.h>
+#include <libk/string.h>
+
+struct disk
+{
+    disk_type type;
+    int sector_size;
+};
+
+static struct disk saved_disk;
 
 // ATA
-
-int disk_read_sectors(int lba, int total, void *dst) {
+// read from Primary Disk
+int disk_read_sectors(u32 lba, int total, void *dst) {
     outb(0x1F6, (lba >> 24) | 0xE0);
     outb(0x1F2, total);
     outb(0x1F3, (u8)(lba & 0xFF));
@@ -27,4 +36,20 @@ int disk_read_sectors(int lba, int total, void *dst) {
     }
 
     return 0;
+}
+
+void disk_locate_and_init(void) {
+    memset(&saved_disk, 0, sizeof(struct disk));
+    saved_disk.type = DISK_TYPE_PHYS;
+    saved_disk.sector_size = DISK_SECTOR_SIZE;
+}
+
+DISK* disk_get(int index) {
+    if (index != 0) return NULL;
+    return &saved_disk;
+}
+
+int disk_read_blocks(DISK* disk, u32 lba, int total, void *dst) {
+    if (disk != &saved_disk) return -STATUS_IO_ERROR;
+    return disk_read_sectors(lba, total, dst);
 }
