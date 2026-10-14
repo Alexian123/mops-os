@@ -4,6 +4,7 @@
 #include <memory/kheap.h>
 #include <memory/paging.h>
 #include <utils.h>
+#include <fs/path.h>
 
 // drivers
 #include <drivers/vga_text.h>
@@ -35,12 +36,6 @@ void kmain(void) {
     paging_switch(kernel_page_dir);
     paging_enable();
     vga_puts("Loaded kernel page directory. Paging is now active.\n");
-
-    // test reading from disk 0
-    char buf[512];
-    memset(buf, 0, 512);
-    DISK *primary = disk_get(0);
-    disk_read_blocks(primary, 0, 1, buf);   // read boot sector
 
     enable_interrupts();
     vga_puts("Interrupts are now active. Beware!\n");

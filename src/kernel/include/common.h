@@ -28,10 +28,11 @@
 
 #define DISK_SECTOR_SIZE            512 // bytes
 
-#define STATUS_OK                   0
-#define STATUS_IO_ERROR             1
-#define STATUS_INVALID_ARG_ERROR    2
-#define STATUS_NO_MEMORY_ERROR      3
+// Path format: drive_no:/text/text/...
+#define PATH_MAX_LEN                128 // bytes
+#define PATH_MAX_TOKEN_LEN          16  // bytes
+#define PATH_ROOT_DELIMITER         ':' // after drive number
+#define PATH_TOKEN_DELIMITER        '/'
 /* ------------------------------------------------------------------- */
 
 
@@ -47,6 +48,18 @@ typedef uint32_t    u32;
 typedef uint64_t    u64;
 
 typedef size_t      szt;
+/* ------------------------------------------------------------------- */
+
+
+/* -------------------------- Return Codes --------------------------- */
+typedef enum _return_code
+{
+    STATUS_OK                           = 0,
+    STATUS_IO_ERROR                     = 1,
+    STATUS_INVALID_ARG_ERROR            = 2,
+    STATUS_NO_MEMORY_ERROR              = 3,
+    STATUS_BAD_PATH_ERROR               = 4,
+} return_code;
 /* ------------------------------------------------------------------- */
 
 #endif
