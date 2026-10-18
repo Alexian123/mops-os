@@ -5,6 +5,7 @@
 #include <memory/paging.h>
 #include <utils.h>
 #include <fs/path.h>
+#include <streams/disk_stream.h>
 
 // drivers
 #include <drivers/vga_text.h>
@@ -39,7 +40,7 @@ void kmain(void) {
 
     enable_interrupts();
     vga_puts("Interrupts are now active. Beware!\n");
-    
+
     // kmain is eternal
     for (;;);
 }
