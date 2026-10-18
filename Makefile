@@ -20,7 +20,7 @@ debug: raw
 raw: kernel bootloader
 	dd if=$(BUILD_DIR)/bootloader/boot.bin >> $(RAW_IMAGE)
 	dd if=$(BUILD_DIR)/kernel/kernel.bin >> $(RAW_IMAGE)
-	dd if=/dev/zero bs=512 count=100 >> $(RAW_IMAGE)
+	dd if=/dev/zero bs=1048576 count=16 >> $(RAW_IMAGE)
 
 kernel: always
 	$(MAKE) -C $(KERNEL_SRC_DIR)

@@ -4,12 +4,32 @@ ORG 0x7C00
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
 
-; short jump + nop (3 bytes) required before BPB
+; short jump + nop (3 bytes) required before header
 jmp short init_cs
 nop
 
-; buffer for BPB
-times 33 db 0
+; FAT16 header
+OEMIdentifier:              db 'MOPSOS  '       ; 8 bytes
+BytesPerSector:             dw 0x200            ; 512 bytes (usually)
+SectorsPerCluster:          db 0x80
+ReservedSectors:            dw 200              ; for the whole kernel; TODO: try loading it from a file ;)
+Fats:                       db 2                ; 2 FAT copies
+RootDirEntries:             dw 0x40
+NumSectors:                 dw 0                ; unused
+MediaType:                  db 0xF8             ; ??
+SectorsPerFAT:              dw 0x100
+SectorsPerTrack:            dw 0x20
+NumberOfHeads:              dw 0x40
+HiddenSectors:              dd 0
+SectorsBig:                 dd 0x773594         ; what?
+
+; Extended BPB (DOS 4.0)
+DriveNumber:                db 0x80
+WinNTBit:                   db 0
+Signature:                  db 0x29
+VolumeID:                   dd 0xD105
+VolumeIDString:             db 'MOPSOS BOOT'    ; 11 bytes
+SystemIDString:             db 'FAT16   '       ; 8 bytes
 
 init_cs:
     jmp 0x0000:start    ; set CS = 0x000 
