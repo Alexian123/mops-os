@@ -1,5 +1,7 @@
 #include <fs/fat/fat16.h>
 #include <streams/disk_stream.h>
+#include <memory/kheap.h>
+#include <utils.h>
 #include <libk/string.h>
 
 #define FAT16_SIGNATURE                 0x29
@@ -80,7 +82,7 @@ struct fat_directory_item
 
 struct fat_directory
 {
-    struct fat_directory_item *items;
+    struct fat_directory_item *item;
     int total;
     int begin_sector_pos;
     int end_sector_pos;
@@ -111,21 +113,150 @@ struct fat_private
     DISK_STREAM *directory_stream;
 };
 
-static void* _fat16_open(struct disk *dist, PATH_TOKEN *tok, file_mode_t mode) {
+static struct filesystem fat16_fs;
+
+static int _fat16_init_private(DISK *disk, struct fat_private *private) {
+    int disk_id = disk_get_id(disk);
+    private->cluster_read_stream = disk_stream_create(disk_id);
+    private->fat_read_stream = disk_stream_create(disk_id);
+    private->directory_stream = disk_stream_create(disk_id);
+
+    if (!private->cluster_read_stream || !private->fat_read_stream || !private->directory_stream) {
+        return -STATUS_NO_MEMORY_ERROR;
+    }
+
+    return 0;
+}
+
+static void _fat16_cleanup_private(struct fat_private *private) {
+    disk_stream_destroy(private->cluster_read_stream);
+    disk_stream_destroy(private->fat_read_stream);
+    disk_stream_destroy(private->directory_stream);
+    kfree(private);
+}
+
+static int _fat16_sector_to_absolute(DISK *disk, int sector) {
+    return sector * disk_get_sector_size(disk);
+}
+
+static int _fat16_get_total_items_in_dir(DISK *disk, struct fat_private *private, int dir_start_sector) {
+    struct fat_directory_item item, empty_item;
+    memset(&item, 0, sizeof(item));
+    memset(&empty_item, 0, sizeof(empty_item));
+
+    int res = 0, i = 0;
+    int dir_start_pos = _fat16_sector_to_absolute(disk, dir_start_sector);
+    DISK_STREAM *stream = private->directory_stream;
+
+    res = disk_stream_seek(stream, dir_start_pos);
+    if (res < 0) return res;
+
+    for (;;) {
+        res = disk_stream_read(stream, &item, sizeof(item));
+        if (res < 0) return res;
+
+        if (item.filename[0] == 0) { // blank record, marks end
+            break;
+        }
+
+        if (item.filename[0] == 0xE5) { // item unused
+            continue;
+        }
+
+        ++i;
+    }
+
+    return i;
+}
+
+static int _fat16_load_root_dir(DISK *disk, struct fat_private *private) {
+    struct fat_directory *dir = &(private->root_dir);
+    struct fat_header *primary = &(private->header.primary);
+    int root_dir_sector_pos = primary->fat_copies * primary->sectors_per_fat + primary->reserved_sectors;
+    int root_dir_entries = primary->root_dir_entries;
+    int root_dir_size = root_dir_entries * sizeof(struct fat_directory_item);
+    int disk_sector_size = disk_get_sector_size(disk);
+    int total_sectors = root_dir_size / disk_sector_size;
+
+    if (root_dir_size % disk_sector_size) {
+        ++total_sectors;
+    }
+
+    int total_items = _fat16_get_total_items_in_dir(disk, private, root_dir_sector_pos);
+
+    struct fat_directory_item *dir_item = kzalloc(root_dir_size);
+    if (!dir_item) return -STATUS_NO_MEMORY_ERROR;
+
+    DISK_STREAM *stream = private->directory_stream;
+    int res = disk_stream_seek(stream, _fat16_sector_to_absolute(disk, root_dir_sector_pos));
+    if (res < 0) {
+        kfree(dir_item);
+        return res;
+    }
+
+    res = disk_stream_read(stream, dir_item, root_dir_size);
+    if (res < 0) {
+        kfree(dir_item);
+        return res;
+    }
+
+    dir->item = dir_item;
+    dir->total = total_items;
+    dir->begin_sector_pos = root_dir_sector_pos;
+    dir->end_sector_pos = root_dir_sector_pos + root_dir_size / disk_sector_size;
+    return 0;
+}
+
+static int fat16_resolve(DISK *disk) {
+    if (!disk) return -STATUS_INVALID_ARG_ERROR;
+
+    struct fat_private *private = kzalloc(sizeof(struct fat_private));
+    if (!private) return -STATUS_NO_MEMORY_ERROR;
+
+    int res = _fat16_init_private(disk, private);
+    if (res < 0) return res;
+
+    DISK_STREAM *stream = disk_stream_create(disk_get_id(disk));
+    if (!stream) {
+        _fat16_cleanup_private(private);
+        return -STATUS_NO_MEMORY_ERROR;
+    }
+
+    res = disk_stream_read(stream, &private->header, sizeof(private->header));
+    if (res < 0) {
+        _fat16_cleanup_private(private);
+        disk_stream_destroy(stream);
+        return res;
+    }
+
+    // check if FAT16 signature is present
+    if (private->header.extended.signature != 0x29) {
+        _fat16_cleanup_private(private);
+        disk_stream_destroy(stream);
+        return -STATUS_FS_NOT_PRESENT_ERROR;
+    }
+
+    res = _fat16_load_root_dir(disk, private);
+    if (res < 0) {
+        _fat16_cleanup_private(private);
+        disk_stream_destroy(stream);
+        return res;
+    }
+
+    disk_set_fs_private(disk, private);
+    disk_stream_destroy(stream);
+    return 0;
+}
+
+static void* fat16_open(DISK *disk, PATH_TOKEN *tok, file_mode_t mode) {
+    if (!disk || !tok) return NULL;
     return NULL;
 }
 
-static int _fat16_resolve(struct disk *disk) {
-    return -1;
-}
-
-static struct filesystem fat16_fs = 
-{
-    .open = _fat16_open,
-    .resolve = _fat16_resolve
-};
-
 struct filesystem* fat16_init() {
+    memset(&fat16_fs, 0, sizeof(fat16_fs));
+    fat16_fs.open = fat16_open;
+    fat16_fs.resolve = fat16_resolve;
     strncpy(fat16_fs.name, "FAT16", MAX_FILESYSTEM_NAME_LEN);
     return &fat16_fs;
 }

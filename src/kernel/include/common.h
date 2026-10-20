@@ -63,6 +63,7 @@ typedef enum _return_code
     STATUS_INVALID_ARG_ERROR            = 2,
     STATUS_NO_MEMORY_ERROR              = 3,
     STATUS_BAD_PATH_ERROR               = 4,
+    STATUS_FS_NOT_PRESENT_ERROR         = 5,
 } return_code;
 /* ------------------------------------------------------------------- */
 

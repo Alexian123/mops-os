@@ -1,13 +1,18 @@
 #include <drivers/disk.h>
 #include <port_io.h>
-#include <fs/file.h>
 #include <libk/string.h>
+
+#define DISK_TYPE_PHYS  0
+
+typedef unsigned int disk_type_t;
 
 struct disk
 {
     disk_type_t type;
     int sector_size;
+    int id;
     struct filesystem *fs;
+    void *fs_private;
 };
 
 static struct disk saved_disk;
@@ -45,6 +50,7 @@ void disk_locate_and_init(void) {
     saved_disk.type = DISK_TYPE_PHYS;
     saved_disk.sector_size = DISK_SECTOR_SIZE;
     saved_disk.fs = fs_resolve(&saved_disk);
+    saved_disk.id = 0;
 }
 
 DISK* disk_get(int index) {
@@ -52,7 +58,33 @@ DISK* disk_get(int index) {
     return &saved_disk;
 }
 
-int disk_read_blocks(DISK* disk, u32 lba, int total, void *dst) {
+int disk_read_blocks(DISK *disk, u32 lba, int total, void *dst) {
     if (disk != &saved_disk) return -STATUS_IO_ERROR;
     return disk_read_sectors(lba, total, dst);
+}
+
+int disk_get_id(DISK *disk) {
+    if (!disk) return -STATUS_INVALID_ARG_ERROR;
+    return disk->id;
+}
+
+int disk_get_sector_size(DISK *disk) {
+    if (!disk) return -STATUS_INVALID_ARG_ERROR;
+    return disk->sector_size;
+}
+
+void* disk_get_fs_private(DISK *disk) {
+    if (!disk) return NULL;
+    return disk->fs_private;
+}
+
+void disk_set_fs_private(DISK *disk, void *fs_private) {
+    if (disk) {
+        disk->fs_private = fs_private;
+    }
+}
+
+struct filesystem* disk_get_fs(DISK *disk) {
+    if (!disk) return NULL;
+    return disk->fs;
 }
