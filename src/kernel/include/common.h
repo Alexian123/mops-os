@@ -33,6 +33,9 @@
 #define PATH_MAX_TOKEN_LEN          16  // bytes
 #define PATH_ROOT_DELIMITER         ':' // after drive number
 #define PATH_TOKEN_DELIMITER        '/'
+
+#define MAX_FILESYSTEMS             16
+#define MAX_FILE_DESCRIPTORS        512
 /* ------------------------------------------------------------------- */
 
 

@@ -8,7 +8,7 @@ static struct heap kernel_heap;
 static struct heap_table kernel_heap_table;
 
 void kheap_init(void) {
-    kernel_heap_table.entries = (hb_table_entry*)KERNEL_HEAP_TABLE_ADDRESS;
+    kernel_heap_table.entries = (hb_table_entry_t*)KERNEL_HEAP_TABLE_ADDRESS;
     kernel_heap_table.total = KERNEL_HEAP_SIZE_BYTES / HEAP_BLOCK_SIZE;
 
     void *end = (void*)(KERNEL_HEAP_ADDRESS + KERNEL_HEAP_SIZE_BYTES);

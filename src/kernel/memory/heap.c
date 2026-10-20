@@ -33,7 +33,7 @@ static u32 _heap_align_val_to_upper(u32 val) {
     return val;
 }
 
-static int _heap_get_entry_type(hb_table_entry entry) {
+static int _heap_get_entry_type(hb_table_entry_t entry) {
     return entry & 0x0F;
 }
 
@@ -70,7 +70,7 @@ static int _heap_get_start_block(struct heap *heap, u32 blocks) {
 static void _heap_mark_blocks_taken(struct heap *heap, int start_block, u32 blocks) {
     int end_block = start_block + blocks - 1;
 
-    hb_table_entry entry = HEAP_BLOCK_TABLE_ENTRY_TAKEN | HEAP_BLOCK_IS_FIRST;
+    hb_table_entry_t entry = HEAP_BLOCK_TABLE_ENTRY_TAKEN | HEAP_BLOCK_IS_FIRST;
     if (blocks > 1) {
         entry |= HEAP_BLOCK_HAS_NEXT;
     }
@@ -90,7 +90,7 @@ static void _heap_mark_blocks_taken(struct heap *heap, int start_block, u32 bloc
 static void _heap_mark_blocks_free(struct heap *heap, int block) {
     struct heap_table *table = heap->table;
     for (int i = block; i < (int)table->total; ++i) {
-        hb_table_entry entry = table->entries[i];
+        hb_table_entry_t entry = table->entries[i];
         table->entries[i] = HEAP_BLOCK_TABLE_ENTRY_FREE;
         if (!(entry & HEAP_BLOCK_HAS_NEXT)) break;
     }
@@ -124,7 +124,7 @@ int heap_create(struct heap *heap, void *ptr, void *end, struct heap_table *tabl
     res = _heap_validate_table(ptr, end, table);
     if (res < 0) return res;
 
-    szt table_size = sizeof(hb_table_entry) * table->total;
+    szt table_size = sizeof(hb_table_entry_t) * table->total;
     memset(table->entries, HEAP_BLOCK_TABLE_ENTRY_FREE, table_size);
 
     return res;

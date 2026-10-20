@@ -1,11 +1,13 @@
 #include <drivers/disk.h>
 #include <port_io.h>
+#include <fs/file.h>
 #include <libk/string.h>
 
 struct disk
 {
-    disk_type type;
+    disk_type_t type;
     int sector_size;
+    struct filesystem *fs;
 };
 
 static struct disk saved_disk;
@@ -42,6 +44,7 @@ void disk_locate_and_init(void) {
     memset(&saved_disk, 0, sizeof(struct disk));
     saved_disk.type = DISK_TYPE_PHYS;
     saved_disk.sector_size = DISK_SECTOR_SIZE;
+    saved_disk.fs = fs_resolve(&saved_disk);
 }
 
 DISK* disk_get(int index) {

@@ -138,3 +138,19 @@ char* path_to_string(PATH *p) {
     str[pos] = '\0';
     return str;
 }
+
+int path_get_drive_number(PATH *p) {
+    return p->drive_no;
+}
+
+PATH_TOKEN* path_get_first_token(PATH *p) {
+    return p->first;
+}
+
+PATH_TOKEN* path_get_next_token(PATH_TOKEN *pt) {
+    return pt->next;
+}
+
+const char* path_get_token_text(PATH_TOKEN *pt) {
+    return pt->text;
+}

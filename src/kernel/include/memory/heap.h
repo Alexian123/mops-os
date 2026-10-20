@@ -3,11 +3,11 @@
 
 #include <common.h>
 
-typedef u8 hb_table_entry;
+typedef u8 hb_table_entry_t;
 
 struct heap_table
 {
-    hb_table_entry *entries;
+    hb_table_entry_t *entries;
     szt total;
 };
 
