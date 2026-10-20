@@ -5,7 +5,7 @@
 
 #define DISK_TYPE_PHYS  0
 
-typedef u32 disk_type_t;
+typedef unsigned int disk_type_t;
 
 typedef struct disk DISK;
 

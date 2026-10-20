@@ -29,7 +29,7 @@ struct filesystem
 {
     fs_resolve_func resolve;    // should return 0 if disk is using this fs
     fs_open_func open;
-    char name[16];
+    char name[MAX_FILESYSTEM_NAME_LEN];
 };
 
 void fs_init();

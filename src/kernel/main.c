@@ -1,11 +1,12 @@
 #include <common.h>
 #include <interrupts/idt.h>
 #include <port_io.h>
+#include <utils.h>
+#include <fs/file.h>
+
+// memory
 #include <memory/kheap.h>
 #include <memory/paging.h>
-#include <utils.h>
-#include <fs/path.h>
-#include <streams/disk_stream.h>
 
 // drivers
 #include <drivers/vga_text.h>
@@ -21,13 +22,19 @@ void kmain(void) {
     vga_clearscr();
     vga_puts("Welcome to MOPS-OS!\n");
 
+    // init kernel heap
     kheap_init();
     vga_puts("Initialized kernel heap.\n");
+
+    // init file systems
+    fs_init();
+    vga_puts("Initialized file systems.\n");
 
     // init disks
     disk_locate_and_init();
     vga_puts("Located and initialized all disks (lie).\n");
 
+    // load IDT
     idt_init();
     vga_puts("Loaded IDT.\n");
 

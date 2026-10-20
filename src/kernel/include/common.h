@@ -34,6 +34,7 @@
 #define PATH_ROOT_DELIMITER         ':' // after drive number
 #define PATH_TOKEN_DELIMITER        '/'
 
+#define MAX_FILESYSTEM_NAME_LEN     16
 #define MAX_FILESYSTEMS             16
 #define MAX_FILE_DESCRIPTORS        512
 /* ------------------------------------------------------------------- */

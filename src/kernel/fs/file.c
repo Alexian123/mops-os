@@ -1,4 +1,5 @@
 #include <fs/file.h>
+#include <fs/fat/fat16.h>
 #include <common.h>
 #include <utils.h>
 #include <libk/string.h>
@@ -25,7 +26,7 @@ static struct filesystem** _get_free_fs() {
 }
 
 static void _fs_builtin_load() {
-    //fs_add(fat16_init());
+    fs_add(fat16_init());
 }
 
 static int _create_file_descriptor(struct file_descriptor **out_desc) {
