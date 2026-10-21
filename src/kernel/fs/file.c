@@ -4,13 +4,14 @@
 #include <utils.h>
 #include <libk/string.h>
 #include <memory/kheap.h>
+#include <drivers/disk.h>
 
 struct file_descriptor
 {
     int index;
     struct filesystem *fs;
     void *private; // private data for internal fd
-    struct disk *disk;
+    DISK *disk;
 };
 
 struct filesystem *fs_arr[MAX_FILESYSTEMS];
@@ -52,6 +53,19 @@ static struct file_descriptor* _get_file_descriptor(int index) {
     return fd_arr[index - 1];
 }
 
+static file_mode_t _get_file_mode_from_str(const char *s) {
+    file_mode_t mode = FILE_MODE_INVALID;
+    if (!s) return mode;
+    if (strnieq(s, "r", 1)) {
+        mode = FILE_MODE_READ;
+    } else if (strnieq(s, "w", 1)) {
+        mode = FILE_MODE_WRITE;
+    } else if (strnieq(s, "a", 1)) {
+        mode = FILE_MODE_APPEND;
+    }
+    return mode;
+}
+
 void fs_init() {
     memset(fd_arr, 0, sizeof(fd_arr));
     memset(fs_arr, 0, sizeof(fs_arr));
@@ -67,7 +81,7 @@ void fs_add(struct filesystem *fs) {
     *free_fs = fs;
 }
 
-struct filesystem* fs_resolve(struct disk *disk) {
+struct filesystem* fs_resolve(DISK *disk) {
     for (int i = 0; i < MAX_FILESYSTEMS; ++i) {
         if (fs_arr[i] != NULL && fs_arr[i]->resolve(disk) == 0) {
             return fs_arr[i];
@@ -76,6 +90,52 @@ struct filesystem* fs_resolve(struct disk *disk) {
     return NULL;
 }
 
-int kopen(const char *filename, const char *mode) {
-    return -1;
+int kopen(const char *filename, const char *mode_str) {
+    PATH *root = path_parse(filename, NULL);
+    if (!root) return -STATUS_UNKNOWN_ERROR;
+
+    PATH_TOKEN *first = path_get_first_token(root);
+    if (!first) {
+        path_destroy(root);
+        return -STATUS_INVALID_ARG_ERROR;
+    }
+
+    int drive_no = path_get_drive_number(root);
+    DISK *disk = disk_get(drive_no);
+    if (!disk) {
+        path_destroy(root);
+        return -STATUS_IO_ERROR;
+    }
+
+    struct filesystem *fs = disk_get_fs(disk);
+    if (!fs) {
+        path_destroy(root);
+        return -STATUS_IO_ERROR;
+    }
+
+    file_mode_t mode = _get_file_mode_from_str(mode_str);
+    if (mode == FILE_MODE_INVALID) {
+        path_destroy(root);
+        return -STATUS_INVALID_ARG_ERROR;
+    }
+    
+    void *fd_private_data = fs->open(disk, first, mode);
+    if (IS_ERR(fd_private_data)) {
+        path_destroy(root);
+        return ERR_I(fd_private_data);
+    }
+
+    struct file_descriptor *fd = NULL;
+    int res = _create_file_descriptor(&fd);
+    if (res < 0) {
+        path_destroy(root);
+        return -STATUS_INVALID_ARG_ERROR;
+    }
+
+    fd->fs = fs;
+    fd->private = fd_private_data;
+    fd->disk = disk;
+
+    path_destroy(root);   
+    return fd->index;
 }

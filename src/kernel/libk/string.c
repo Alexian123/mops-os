@@ -1,4 +1,5 @@
 #include <libk/string.h>
+#include <libk/ctype.h>
 
 /* ------------------------ Memory functions ------------------------ */
 void* memcpy(void *dst, const void *src, szt n)
@@ -34,6 +35,15 @@ szt strnlen(const char *s, szt n) {
     szt len;
     for (len = 0; len < n; ++len) {
         if (s[len] == 0) break;
+    }
+    return len;
+}
+
+szt strnlent(const char *s, szt n, char t) {
+    szt len;
+    for (len = 0; len < n; ++len) {
+        if (s[len] == t || s[len] == 0) 
+            break;
     }
     return len;
 }
@@ -73,6 +83,15 @@ int strcmp(const char *dst, const char *src) {
     return (int)(unsigned char)*dst - (int)(unsigned char)*src;
 }
 
+int stricmp(const char *dst, const char *src) {
+    while (*dst && (unsigned char)tolower(*dst) == (unsigned char)tolower(*src)) {
+        ++dst;
+        ++src;
+    }
+    return (int)(unsigned char)tolower(*dst) - (int)(unsigned char)tolower(*src);
+}
+
+
 int strncmp(const char *dst, const char *src, szt n) {
     for (szt i = 0; i < n; ++i) {
         unsigned char a = (unsigned char)dst[i];
@@ -85,12 +104,32 @@ int strncmp(const char *dst, const char *src, szt n) {
     return 0;
 }
 
+int strnicmp(const char *dst, const char *src, szt n) {
+    for (szt i = 0; i < n; ++i) {
+        unsigned char a = (unsigned char)tolower(dst[i]);
+        unsigned char b = (unsigned char)tolower(src[i]);
+        if (a != b)
+            return (int)a - (int)b;
+        if (a == '\0')
+            return 0;
+    }
+    return 0;
+}
+
 int streq(const char *dst, const char *src) {
     return strcmp(dst, src) == 0;
 }
 
+int strieq(const char *dst, const char *src) {
+    return stricmp(dst, src) == 0;
+}
+
 int strneq(const char *dst, const char *src, szt n) {
     return strncmp(dst, src, n) == 0;
+}
+
+int strnieq(const char *dst, const char *src, szt n) {
+    return strnicmp(dst, src, n) == 0;
 }
 /* ------------------------------------------------------------------ */
 

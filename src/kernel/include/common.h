@@ -55,6 +55,13 @@ typedef size_t      szt;
 /* ------------------------------------------------------------------- */
 
 
+/* -------------------------- Error Macros --------------------------- */
+#define ERR(VAL)        ((void*)(VAL))
+#define ERR_I(VAL)      ((int)(VAL))
+#define IS_ERR(VAL)     ((int)(VAL) < 0)
+/* ------------------------------------------------------------------- */
+
+
 /* -------------------------- Return Codes --------------------------- */
 typedef enum _return_code
 {
@@ -64,6 +71,7 @@ typedef enum _return_code
     STATUS_NO_MEMORY_ERROR              = 3,
     STATUS_BAD_PATH_ERROR               = 4,
     STATUS_FS_NOT_PRESENT_ERROR         = 5,
+    STATUS_UNKNOWN_ERROR                = 6,
 } return_code;
 /* ------------------------------------------------------------------- */
 

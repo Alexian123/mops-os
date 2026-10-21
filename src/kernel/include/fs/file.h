@@ -20,10 +20,9 @@ enum file_mode
     FILE_MODE_INVALID
 };
 
-struct disk;
-
-typedef void* (*fs_open_func)(struct disk *disk, PATH_TOKEN *tok, file_mode_t mode);
-typedef int (*fs_resolve_func)(struct disk *disk);
+typedef struct disk DISK; // from drivers/disk.h
+typedef void* (*fs_open_func)(DISK *disk, PATH_TOKEN *tok, file_mode_t mode);
+typedef int (*fs_resolve_func)(DISK *disk);
 
 struct filesystem
 {
@@ -34,8 +33,8 @@ struct filesystem
 
 void fs_init();
 void fs_add(struct filesystem *fs);
-struct filesystem* fs_resolve(struct disk *disk);
+struct filesystem* fs_resolve(DISK *disk);
 
-int kopen(const char *filename, const char *mode);
+int kopen(const char *filename, const char *mode_str);
 
 #endif
