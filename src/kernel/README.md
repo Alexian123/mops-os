@@ -78,7 +78,7 @@ union foo
 };
 ```
 
-- conditional statements and loops: opening curly bracket placed on the very next line
+- conditional statements and loops: opening curly bracket placed on the same line as the condition
 ```c
 if (foo) {
     ...
