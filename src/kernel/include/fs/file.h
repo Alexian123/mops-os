@@ -21,13 +21,13 @@ enum file_mode
 };
 
 typedef struct disk DISK; // from drivers/disk.h
-typedef void* (*fs_open_func)(DISK *disk, PATH_TOKEN *tok, file_mode_t mode);
-typedef int (*fs_resolve_func)(DISK *disk);
+typedef void* (*fs_open_func_t)(DISK *disk, PATH_TOKEN *tok, file_mode_t mode);
+typedef int (*fs_resolve_func_t)(DISK *disk);
 
 struct filesystem
 {
-    fs_resolve_func resolve;    // should return 0 if disk is using this fs
-    fs_open_func open;
+    fs_resolve_func_t resolve;    // should return 0 if disk is using this fs
+    fs_open_func_t open;
     char name[MAX_FILESYSTEM_NAME_LEN];
 };
 

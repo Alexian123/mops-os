@@ -18,7 +18,7 @@
 
 static PAGING_4GB_CHUNK *kchunk = NULL;
 
-void kmain(void) {
+void ASMCALL kmain(void) {
     vga_clearscr();
     vga_puts("Welcome to MOPS-OS!\n");
 
