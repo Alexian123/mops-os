@@ -22,7 +22,7 @@ fi
 sudo mount -t vfat $OS_IMAGE $MOUNT_POINT
 
 # Move dummy file
-sudo mv $TEMP_FILE "$MOUNT_POINT/file.txt"
+sudo mv $TEMP_FILE "$MOUNT_POINT/hello.txt"
 
 # Unmount fs
 sudo umount $MOUNT_POINT

@@ -72,6 +72,7 @@ typedef enum _return_code
     STATUS_BAD_PATH_ERROR               = 4,
     STATUS_FS_NOT_PRESENT_ERROR         = 5,
     STATUS_UNKNOWN_ERROR                = 6,
+    STATUS_UNSUPPORTED_ERROR            = 7,
 } return_code_t;
 /* ------------------------------------------------------------------- */
 

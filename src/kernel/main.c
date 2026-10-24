@@ -48,6 +48,17 @@ void ASMCALL kmain(void) {
     enable_interrupts();
     vga_puts("Interrupts are now active. Beware!\n");
 
+    int fd = kopen("0:/hello.txt", "r");
+    if (fd < 0) {
+        int error_no = -fd;
+        char c = DIGIT_NUM_TO_CHAR(error_no);
+        vga_puts("Error reading file. CODE: ");
+        vga_putc(c);
+        vga_putc('\n');
+    } else {
+        vga_puts("Successfully opened file.\n");
+    }
+
     // kmain is eternal
     for (;;);
 }
