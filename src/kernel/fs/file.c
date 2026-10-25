@@ -157,3 +157,12 @@ int kseek(int fd, int offset, file_seek_mode_t from) {
 
     return desc->fs->seek(desc->private, offset, from);
 }
+
+int kstat(int fd, struct filestat *stat) {
+    if (fd < 1 || !stat) return -STATUS_INVALID_ARG_ERROR;
+
+    struct file_descriptor *desc = _get_file_descriptor(fd);
+    if (!desc) return -STATUS_INVALID_ARG_ERROR;
+
+    return desc->fs->stat(desc->disk, desc->private, stat);
+}
