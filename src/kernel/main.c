@@ -15,6 +15,7 @@
 // libk
 #include <libk/string.h>
 #include <libk/ctype.h>
+#include <libk/stdlib.h>
 
 static PAGING_4GB_CHUNK *kchunk = NULL;
 
@@ -57,6 +58,16 @@ void ASMCALL kmain(void) {
         vga_putc('\n');
     } else {
         vga_puts("Successfully opened file.\n");
+
+        struct filestat stat;
+        memset(&stat, 0, sizeof(stat));
+        kstat(fd, &stat);
+        char size_str[16];
+        memset(size_str, 0, sizeof(size_str));
+        itoa(size_str, (int)stat.size);
+        vga_puts("File size: ");
+        vga_puts(size_str);
+        vga_puts(" bytes\n");
 
         char buf[64];
         memset(buf, 0, sizeof(buf));
