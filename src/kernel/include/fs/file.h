@@ -25,12 +25,14 @@ typedef struct disk DISK; // from drivers/disk.h
 typedef int (*fs_resolve_func_t)(DISK *disk);
 typedef void* (*fs_open_func_t)(DISK *disk, PATH_TOKEN *tok, file_mode_t mode);
 typedef int (*fs_read_func_t)(DISK *disk, void *private, u32 size, u32 nmemb, char *out);
+typedef int (*fs_seek_func_t)(void *private, u32 offset, file_seek_mode_t mode);
 
 struct filesystem
 {
     fs_resolve_func_t resolve;    // should return 0 if disk is using this fs
     fs_open_func_t open;
     fs_read_func_t read;
+    fs_seek_func_t seek;
     char name[MAX_FILESYSTEM_NAME_LEN];
 };
 
@@ -40,5 +42,6 @@ struct filesystem* fs_resolve(DISK *disk);
 
 int kopen(const char *filename, const char *mode_str);
 int kread(void *dest, u32 size, u32 nmemb, int fd);
+int kseek(int fd, int offset, file_seek_mode_t from);
 
 #endif

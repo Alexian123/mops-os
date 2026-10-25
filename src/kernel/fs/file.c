@@ -148,3 +148,12 @@ int kread(void *dest, u32 size, u32 nmemb, int fd) {
 
     return desc->fs->read(desc->disk, desc->private, size, nmemb, (char*)dest);
 }
+
+int kseek(int fd, int offset, file_seek_mode_t from) {
+    if (fd < 1 || offset < 0) return -STATUS_INVALID_ARG_ERROR;
+
+    struct file_descriptor *desc = _get_file_descriptor(fd);
+    if (!desc) return -STATUS_INVALID_ARG_ERROR;
+
+    return desc->fs->seek(desc->private, offset, from);
+}

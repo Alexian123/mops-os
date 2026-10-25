@@ -9,9 +9,11 @@ OS_IMAGE=$1
 MOUNT_POINT=/mnt/temp
 TEMP_FILE=./.dummy_file.txt
 
-# Create dummy file
-touch $TEMP_FILE
-echo "hello from file" > $TEMP_FILE
+# Create dummy file if it doesn't exist
+if ! [ -f $TEMP_FILE ]; then
+    touch $TEMP_FILE
+    echo "hello from file" > $TEMP_FILE
+fi
 
 # Create mount dir
 if ! [ -d $MOUNT_POINT ]; then 
@@ -22,7 +24,7 @@ fi
 sudo mount -t vfat $OS_IMAGE $MOUNT_POINT
 
 # Move dummy file
-sudo mv $TEMP_FILE "$MOUNT_POINT/hello.txt"
+sudo cp $TEMP_FILE "$MOUNT_POINT/hello.txt"
 
 # Unmount fs
 sudo umount $MOUNT_POINT

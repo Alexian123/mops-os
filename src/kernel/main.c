@@ -60,7 +60,7 @@ void ASMCALL kmain(void) {
 
         char buf[64];
         memset(buf, 0, sizeof(buf));
-        kread(buf, sizeof(buf), 1, fd);
+        kread(buf, sizeof(buf) - 1, 1, fd);
         vga_puts(buf);
     }
 
