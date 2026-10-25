@@ -525,11 +525,36 @@ static int fat16_read(DISK *disk, void *private, u32 size, u32 nmemb, char *out)
     return read;
 }
 
+static int fat16_seek(void *private, u32 offset, file_seek_mode_t mode) {
+    struct fat_fd *desc = (struct fat_fd*)private;
+    struct fat_item *item = desc->item;
+    if (item->type != FAT_ITEM_TYPE_FILE) return -STATUS_INVALID_ARG_ERROR;
+
+    struct fat_directory_item *dir_item = item->item;
+    if (offset >= dir_item->file_size) return -STATUS_INVALID_ARG_ERROR;
+
+    switch (mode) {
+    case SEEK_CUR:
+        desc->pos += offset;
+        break;
+    case SEEK_SET:
+        desc->pos = offset;
+        break;
+    case SEEK_END:
+        return -STATUS_UNSUPPORTED_ERROR;
+    default:
+        return -STATUS_INVALID_ARG_ERROR;
+    }
+
+    return STATUS_OK;
+}
+
 struct filesystem* fat16_init() {
     memset(&fat16_fs, 0, sizeof(fat16_fs));
     fat16_fs.resolve = fat16_resolve;
     fat16_fs.open = fat16_open;
     fat16_fs.read = fat16_read;
+    fat16_fs.seek = fat16_seek;
     strncpy(fat16_fs.name, "FAT16", MAX_FILESYSTEM_NAME_LEN);
     return &fat16_fs;
 }
