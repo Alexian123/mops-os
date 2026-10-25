@@ -75,6 +75,10 @@ void ASMCALL kmain(void) {
         kseek(fd, 29, SEEK_CUR);
         kread(buf, sizeof(buf) - 1, 1, fd);
         vga_puts(buf);
+        vga_putc('\n');
+
+        kclose(fd);
+        vga_puts("Successfully closed file.\n");
     }
 
     // kmain is eternal

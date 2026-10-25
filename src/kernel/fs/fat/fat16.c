@@ -565,6 +565,17 @@ int fat16_stat(DISK *disk, void *private, struct filestat *stat) {
     return STATUS_OK;
 }
 
+static void _fat16_free_fd(struct fat_fd *desc) {
+    _fat16_free_fat_item(desc->item);
+    kfree(desc);
+}
+
+int fat16_close(void *private) {
+    struct fat_fd *desc = (struct fat_fd*)private;
+    _fat16_free_fd(desc);
+    return STATUS_OK;
+}
+
 struct filesystem* fat16_init() {
     memset(&fat16_fs, 0, sizeof(fat16_fs));
     fat16_fs.resolve = fat16_resolve;
@@ -572,6 +583,7 @@ struct filesystem* fat16_init() {
     fat16_fs.read = fat16_read;
     fat16_fs.seek = fat16_seek;
     fat16_fs.stat = fat16_stat;
+    fat16_fs.close = fat16_close;
     strncpy(fat16_fs.name, "FAT16", MAX_FILESYSTEM_NAME_LEN);
     return &fat16_fs;
 }

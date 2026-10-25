@@ -48,6 +48,11 @@ static int _create_file_descriptor(struct file_descriptor **out_desc) {
     return res;
 }
 
+static void _destroy_file_descriptor(struct file_descriptor *desc) {
+    fd_arr[desc->index - 1] = 0;
+    kfree(desc);
+}
+
 static struct file_descriptor* _get_file_descriptor(int index) {
     if (index <= 0 || index > MAX_FILE_DESCRIPTORS) return NULL;
     return fd_arr[index - 1];
@@ -173,5 +178,11 @@ int kclose(int fd) {
     struct file_descriptor *desc = _get_file_descriptor(fd);
     if (!desc) return -STATUS_INVALID_ARG_ERROR;
 
-    return desc->fs->close(desc->private);
+    int res = desc->fs->close(desc->private);
+
+    if (res == STATUS_OK) {
+        _destroy_file_descriptor(desc);
+    }
+
+    return res;
 }
