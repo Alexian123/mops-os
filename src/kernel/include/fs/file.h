@@ -39,6 +39,7 @@ typedef void* (*fs_open_func_t)(DISK *disk, PATH_TOKEN *tok, file_mode_t mode);
 typedef int (*fs_read_func_t)(DISK *disk, void *private, u32 size, u32 nmemb, char *out);
 typedef int (*fs_seek_func_t)(void *private, u32 offset, file_seek_mode_t mode);
 typedef int (*fs_stat_func_t)(DISK *disk, void *private, struct filestat *stat);
+typedef int (*fs_close_func_t)(void *private);
 
 struct filesystem
 {
@@ -47,6 +48,7 @@ struct filesystem
     fs_read_func_t read;
     fs_seek_func_t seek;
     fs_stat_func_t stat;
+    fs_close_func_t close;
     char name[MAX_FILESYSTEM_NAME_LEN];
 };
 
@@ -58,5 +60,6 @@ int kopen(const char *filename, const char *mode_str);
 int kread(void *dest, u32 size, u32 nmemb, int fd);
 int kseek(int fd, int offset, file_seek_mode_t from);
 int kstat(int fd, struct filestat *stat);
+int kclose(int fd);
 
 #endif
