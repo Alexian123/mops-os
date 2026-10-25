@@ -504,10 +504,32 @@ static void* fat16_open(DISK *disk, PATH_TOKEN *tok, file_mode_t mode) {
     return fd;
 }
 
+static int fat16_read(DISK *disk, void *private, u32 size, u32 nmemb, char *out) {
+    struct fat_fd *desc = (struct fat_fd*)private;
+    struct fat_directory_item *dir_item = desc->item->item;
+    int offset = desc->pos;
+    int read = 0;
+    for (u32 i = 0; i < nmemb; ++i) {
+        int res = _fat16_read_internal(
+            disk,
+            _fat16_get_first_cluster_of(dir_item),
+            offset,
+            size,
+            out
+        );
+        if (res < 0) break;
+        out += size;
+        offset += size;
+        ++read;
+    }   
+    return read;
+}
+
 struct filesystem* fat16_init() {
     memset(&fat16_fs, 0, sizeof(fat16_fs));
-    fat16_fs.open = fat16_open;
     fat16_fs.resolve = fat16_resolve;
+    fat16_fs.open = fat16_open;
+    fat16_fs.read = fat16_read;
     strncpy(fat16_fs.name, "FAT16", MAX_FILESYSTEM_NAME_LEN);
     return &fat16_fs;
 }

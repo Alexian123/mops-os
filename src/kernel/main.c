@@ -57,6 +57,11 @@ void ASMCALL kmain(void) {
         vga_putc('\n');
     } else {
         vga_puts("Successfully opened file.\n");
+
+        char buf[64];
+        memset(buf, 0, sizeof(buf));
+        kread(buf, sizeof(buf), 1, fd);
+        vga_puts(buf);
     }
 
     // kmain is eternal

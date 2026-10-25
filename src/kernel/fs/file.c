@@ -146,6 +146,5 @@ int kread(void *dest, u32 size, u32 nmemb, int fd) {
     struct file_descriptor *desc = _get_file_descriptor(fd);
     if (!desc) return -STATUS_INVALID_ARG_ERROR;
 
-    int res = desc->fs->read(desc->disk, desc->private, size, nmemb, (char*)dest);
-    return res;
+    return desc->fs->read(desc->disk, desc->private, size, nmemb, (char*)dest);
 }
