@@ -139,3 +139,13 @@ int kopen(const char *filename, const char *mode_str) {
     path_destroy(root);   
     return fd->index;
 }
+
+int kread(void *dest, u32 size, u32 nmemb, int fd) {
+    if (!dest || size == 0 || nmemb == 0 || fd < 1) return -STATUS_INVALID_ARG_ERROR;
+
+    struct file_descriptor *desc = _get_file_descriptor(fd);
+    if (!desc) return -STATUS_INVALID_ARG_ERROR;
+
+    int res = desc->fs->read(desc->disk, desc->private, size, nmemb, (char*)\dest);
+    return res;
+}

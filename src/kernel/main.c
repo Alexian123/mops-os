@@ -49,7 +49,7 @@ void ASMCALL kmain(void) {
     vga_puts("Interrupts are now active. Beware!\n");
 
     int fd = kopen("0:/hello.txt", "r");
-    if (fd < 0) {
+    if (fd < 1) {
         int error_no = -fd;
         char c = DIGIT_NUM_TO_CHAR(error_no);
         vga_puts("Error reading file. CODE: ");
